@@ -7,10 +7,53 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
 </head>
 <body>
-    <h1>Welcome to Shrink Link</h1>
-    <form action="/shrink" method="POST">
-        <input type="url" name="longUrl" placeholder="Enter your URL here" required>
-        <button type="submit">Shrink!</button>
-    </form>
+    <main class="container">
+        <h1>Shrink Link</h1>
+        <form id="shrink-form" action="/shrink" method="POST">
+            <label for="longUrl">Enter your long URL:</label>
+            <input type="url" id="longUrl" name="longUrl" placeholder="https://example.com" required>
+            <button type="submit">Shrink!</button>
+        </form>
+
+        <!-- Result Block -->
+        <div id="result" style="display: none; margin-top: 20px;">
+            <p>Your shortened link:</p>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="shortLink" readonly style="flex: 1;">
+                <button id="copyButton">Copy</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const form = document.getElementById('shrink-form');
+        const result = document.getElementById('result');
+        const shortLink = document.getElementById('shortLink');
+        const copyButton = document.getElementById('copyButton');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const response = await fetch('/shrink', {
+                method: 'POST',
+                body: new URLSearchParams(formData),
+            });
+
+            if (response.ok) {
+                const shortUrl = await response.text(); // Waiting for the shorted URL
+                shortLink.value = shortUrl;
+                result.style.display = 'block';
+            } else {
+                alert('Failed to shrink the URL. Please try again.');
+            }
+        });
+
+        copyButton.addEventListener('click', () => {
+            shortLink.select();
+            document.execCommand('copy');
+            alert('Link copied to clipboard!');
+        });
+    </script>
 </body>
 </html>

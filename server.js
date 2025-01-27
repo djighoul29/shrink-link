@@ -1,13 +1,23 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
 
 const PORT = 3000;
+const DOMAIN = 'http://localhost';
 
 // Generate short URL code
 function generateCode() {
-    return crypto.randomBytes(3).toString('hex'); // 6 symbols
+    const CHARKIT = [
+        ...Array.from({ length: 10 }, (_, i) => String.fromCharCode(48 + i)), // 0-9
+        ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i)), // A-Z
+        ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i))  // a-z
+    ].join('');
+    let code = '';
+    for (let i = 0; i < 5; i++) {
+        const randomIndex = Math.floor(Math.random() * CHARKIT.length);
+        code += CHARKIT[randomIndex];
+    }
+    return code;
 }
 
 // Read & Write to JSON file
@@ -56,8 +66,9 @@ const server = http.createServer((req, res) => {
             links[code] = longUrl;
             saveLinks(links);
 
-            res.writeHead(302, { 'Location': `/${code}` });
-            res.end();
+            const shortUrl = `${DOMAIN}:${PORT}/${code}`;
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.end(shortUrl);
         });
     } else if (req.url.startsWith('/') && req.method === 'GET') {
         // Redirection
@@ -79,5 +90,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
+    console.log(`Server is running at ${DOMAIN}:${PORT}`);
 });
