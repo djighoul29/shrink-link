@@ -20,12 +20,20 @@ function generateCode() {
     return code;
 }
 
-// Read & Write to JSON file
+// Read & Write to JSON file. Create the file if it doesn't exist
 function readLinks() {
+    const filePath = path.join(__dirname, 'data', 'links.json');
+
+    if (!fs.existsSync(filePath)) {
+        fs.writeFileSync(filePath, JSON.stringify({}, null, 2), 'utf8');
+        console.log('Created links.json as it did not exist.');
+    }
+
     try {
-        const data = fs.readFileSync(path.join(__dirname, 'data', 'links.json'), 'utf8');
+        const data = fs.readFileSync(filePath, 'utf8');
         return JSON.parse(data);
-    } catch {
+    } catch (error) {
+        console.error('Error reading or parsing links.json:', error);
         return {};
     }
 }
