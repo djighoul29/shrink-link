@@ -1,6 +1,6 @@
 # Data
-data/links.json
-
+data/*
+!data/.gitkeep
 
 # Logs
 logs
