@@ -1,0 +1,6 @@
+@import url('https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css');
+
+#result {
+    display: none;
+    margin-top: 20px;
+}

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shrink Link</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
     <main class="container">
@@ -16,44 +16,12 @@
         </form>
 
         <!-- Result Block -->
-        <div id="result" style="display: none; margin-top: 20px;">
-            <p>Your shortened link:</p>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" id="shortLink" readonly style="flex: 1;">
-                <button id="copyButton">Copy</button>
-            </div>
+        <div id="result">
+            <label for="shortLink">Your shortened link (click to copy):</label>
+            <input type="url" id="shortLink" readonly></input>
         </div>
     </main>
 
-    <script>
-        const form = document.getElementById('shrink-form');
-        const result = document.getElementById('result');
-        const shortLink = document.getElementById('shortLink');
-        const copyButton = document.getElementById('copyButton');
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const formData = new FormData(form);
-            const response = await fetch('/shrink', {
-                method: 'POST',
-                body: new URLSearchParams(formData),
-            });
-
-            if (response.ok) {
-                const shortUrl = await response.text(); // Waiting for the shorted URL
-                shortLink.value = shortUrl;
-                result.style.display = 'block';
-            } else {
-                alert('Failed to shrink the URL. Please try again.');
-            }
-        });
-
-        copyButton.addEventListener('click', () => {
-            shortLink.select();
-            document.execCommand('copy');
-            alert('Link copied to clipboard!');
-        });
-    </script>
+    <script src="/script.js"></script>
 </body>
 </html>

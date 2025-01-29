@@ -54,6 +54,26 @@ const server = http.createServer((req, res) => {
             res.writeHead(200, { 'Content-Type': 'text/html' });
             res.end(data);
         });
+    } else if (req.url === '/style.css' && req.method === 'GET') {
+        // Serve style.css
+        fs.readFile(path.join(__dirname, 'public', 'style.css'), 'utf8', (err, data) => {
+            if (err) {
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                return res.end('CSS not found');
+            }
+            res.writeHead(200, { 'Content-Type': 'text/css' });
+            res.end(data);
+        });
+    } else if (req.url === '/script.js' && req.method === 'GET') {
+        // Serve script.js
+        fs.readFile(path.join(__dirname, 'public', 'script.js'), 'utf8', (err, data) => {
+            if (err) {
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                return res.end('JavaScript file not found');
+            }
+            res.writeHead(200, { 'Content-Type': 'application/javascript' });
+            res.end(data);
+        });
     } else if (req.url === '/shrink' && req.method === 'POST') {
         // Form processing
         let body = '';
