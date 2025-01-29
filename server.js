@@ -22,7 +22,13 @@ function generateCode() {
 
 // Read & Write to JSON file. Create the file if it doesn't exist
 function readLinks() {
-    const filePath = path.join(__dirname, 'data', 'links.json');
+    const dirPath = path.join(__dirname, 'data');
+    const filePath = path.join(dirPath, 'links.json');
+
+    if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, { recursive: true });
+        console.log('Created "data" directory.');
+    }
 
     if (!fs.existsSync(filePath)) {
         fs.writeFileSync(filePath, JSON.stringify({}, null, 2), 'utf8');
