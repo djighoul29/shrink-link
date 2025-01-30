@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     shortLink.addEventListener('click', async () => {
         try {
-            await navigator.clipboard.writeText(shortLink.textContent);
+            await navigator.clipboard.writeText(shortLink.value);
             shortLink.style.backgroundColor = 'var(--pico-border-color)';
 
         } catch (err) {

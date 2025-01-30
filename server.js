@@ -20,7 +20,7 @@ function generateCode() {
     return code;
 }
 
-// Read & Write to JSON file. Create the file if it doesn't exist
+// Reads & Writes to JSON file. Creates the file if it doesn't exist
 function readLinks() {
     const dirPath = path.join(__dirname, 'data');
     const filePath = path.join(dirPath, 'links.json');
@@ -100,26 +100,37 @@ const server = http.createServer((req, res) => {
             links[code] = longUrl;
             saveLinks(links);
 
-            const shortUrl = `${DOMAIN}:${PORT}/${code}`;
+            const shortUrl = `${DOMAIN}:${PORT}/goto/${code}`;
             res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end(shortUrl);
         });
-    } else if (req.url.startsWith('/') && req.method === 'GET') {
-        // Redirection
-        const code = req.url.slice(1);
+    } else if (req.url.startsWith('/goto/') && req.method === 'GET') {
+        const code = req.url.replace('/goto/', '');
         const links = readLinks();
-
+    
         if (links[code]) {
             res.writeHead(302, { 'Location': links[code] });
             res.end();
         } else {
-            res.writeHead(404, { 'Content-Type': 'text/plain' });
-            res.end('Not Found: Invalid short URL');
+            fs.readFile(path.join(__dirname, 'views', '404.html'), 'utf8', (err, data) => {
+                if (err) {
+                    res.writeHead(500, { 'Content-Type': 'text/plain' });
+                    return res.end('Server error');
+                }
+                res.writeHead(404, { 'Content-Type': 'text/html' });
+                res.end(data);
+            });
         }
     } else {
         // 404
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('Page not found');
+        fs.readFile(path.join(__dirname, 'views', '404.html'), 'utf8', (err, data) => {
+            if (err) {
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                return res.end('Server error');
+            }
+            res.writeHead(404, { 'Content-Type': 'text/html' });
+            res.end(data);
+        });
     }
 });
 
