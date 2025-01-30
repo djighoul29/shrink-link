@@ -23,12 +23,12 @@ Follow these steps to set up and run the project:
 4. **(Optional) Make necessary changes to configuration files (e.g., `server.js`)**  
 5. **Start the server:**  
     - With nodemon (for development):
-    ```bash
-    npm run dev
-    ```
+        ```bash
+        npm run dev
+        ```
     - Standard method (without auto-restart):
-    ```bash
-    npm start
-    ```
+        ```bash
+        npm start
+        ```
 6. **Open the web service** in your browser:  
 http://localhost:3000/    
