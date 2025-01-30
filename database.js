@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const logger = require('./emitter/logger');
+const logger = require('./logger');
 
 // Connect to SQLite database (or create it if it doesn't exist)
 const db = new sqlite3.Database(path.join(__dirname, 'data', 'shrinklink.db'), (err) => {

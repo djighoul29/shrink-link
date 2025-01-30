@@ -10,7 +10,7 @@ class Logger extends EventEmitter {
         console.log(logMessage.trim()); // Log to console
 
         // Write to file
-        const logFilePath = path.join(__dirname, '../data', 'logs.txt');
+        const logFilePath = path.join(__dirname, 'logs', 'logs.txt');
         fs.appendFile(logFilePath, logMessage, (err) => {
             if (err) {
                 console.error('Error writing to log file:', err);

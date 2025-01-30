@@ -5,7 +5,7 @@ const path = require('path');
 const PORT = 3000;
 const DOMAIN = 'http://localhost';
 
-const logger = require('./emitter/logger');
+const logger = require('./logger');
 const { addLink, getLink } = require('./database');
 
 // Short URL code generator
