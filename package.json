@@ -9,5 +9,8 @@
   "keywords": [],
   "author": "Oleksii Ivanyshyn",
   "license": "Unlicense",
-  "description": "Shrink Link is a minimalist web service designed for quickly and conveniently shortening long URLs."
+  "description": "Shrink Link is a minimalist web service designed for quickly and conveniently shortening long URLs.",
+  "dependencies": {
+    "sqlite3": "^5.1.7"
+  }
 }

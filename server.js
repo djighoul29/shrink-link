@@ -2,12 +2,13 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const logger = require('./emitter/logger');
-
 const PORT = 3000;
 const DOMAIN = 'http://localhost';
 
-// Generate short URL code
+const logger = require('./emitter/logger');
+const { addLink, getLink } = require('./database');
+
+// Short URL code generator
 function generateCode() {
     const CHARKIT = [
         ...Array.from({ length: 10 }, (_, i) => String.fromCharCode(48 + i)), // 0-9
@@ -22,34 +23,6 @@ function generateCode() {
     return code;
 }
 
-// Reads & Writes to JSON file. Creates the file if it doesn't exist
-function readLinks() {
-    const dirPath = path.join(__dirname, 'data');
-    const filePath = path.join(dirPath, 'links.json');
-
-    if (!fs.existsSync(dirPath)) {
-        fs.mkdirSync(dirPath, { recursive: true });
-        logger.log('DATA', 'Created "data" directory.');
-    }
-
-    if (!fs.existsSync(filePath)) {
-        fs.writeFileSync(filePath, JSON.stringify({}, null, 2), 'utf8');
-        logger.log('DATA', 'Created links.json as it did not exist.');
-    }
-
-    try {
-        const data = fs.readFileSync(filePath, 'utf8');
-        return JSON.parse(data);
-    } catch (error) {
-        console.error('Error reading or parsing links.json:', error);
-        return {};
-    }
-}
-
-function saveLinks(links) {
-    fs.writeFileSync(path.join(__dirname, 'data', 'links.json'), JSON.stringify(links, null, 2), 'utf8');
-}
-
 // Server creation
 const server = http.createServer((req, res) => {
     if (req.url === '/' && req.method === 'GET') {
@@ -62,8 +35,9 @@ const server = http.createServer((req, res) => {
             res.writeHead(200, { 'Content-Type': 'text/html' });
             res.end(data);
         });
+
     } else if (req.url === '/style.css' && req.method === 'GET') {
-        // Serve style.css
+        // CSS file
         fs.readFile(path.join(__dirname, 'public', 'style.css'), 'utf8', (err, data) => {
             if (err) {
                 res.writeHead(500, { 'Content-Type': 'text/plain' });
@@ -72,8 +46,9 @@ const server = http.createServer((req, res) => {
             res.writeHead(200, { 'Content-Type': 'text/css' });
             res.end(data);
         });
+
     } else if (req.url === '/script.js' && req.method === 'GET') {
-        // Serve script.js
+        // script.js file
         fs.readFile(path.join(__dirname, 'public', 'script.js'), 'utf8', (err, data) => {
             if (err) {
                 res.writeHead(500, { 'Content-Type': 'text/plain' });
@@ -82,8 +57,9 @@ const server = http.createServer((req, res) => {
             res.writeHead(200, { 'Content-Type': 'application/javascript' });
             res.end(data);
         });
+
     } else if (req.url === '/about.html' && req.method === 'GET') {
-        // Serve about.html
+        // About page
         fs.readFile(path.join(__dirname, 'views', 'about.html'), 'utf8', (err, data) => {
             if (err) {
                 res.writeHead(500, { 'Content-Type': 'text/plain' });
@@ -92,8 +68,9 @@ const server = http.createServer((req, res) => {
             res.writeHead(200, { 'Content-Type': 'text/html' });
             res.end(data);
         });
+
     } else if (req.url === '/shrink' && req.method === 'POST') {
-        // Form processing
+        // Form submission
         let body = '';
         req.on('data', chunk => {
             body += chunk.toString();
@@ -107,38 +84,45 @@ const server = http.createServer((req, res) => {
                 return res.end('Bad Request: No URL provided');
             }
 
-            const links = readLinks();
             const code = generateCode();
-            links[code] = longUrl;
-            saveLinks(links);
-            logger.log('SHRINK', `New URL: ${longUrl} -> ${DOMAIN}:${PORT}/goto/${code}`);
-
-
-            const shortUrl = `${DOMAIN}:${PORT}/goto/${code}`;
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end(shortUrl);
-        });
-    } else if (req.url.startsWith('/goto/') && req.method === 'GET') {
-        const code = req.url.replace('/goto/', '');
-        const links = readLinks();
-    
-        if (links[code]) {
-            logger.log('REDIRECT', `Redirecting ${DOMAIN}:${PORT}/goto/${code} to ${links[code]}`);
-            res.writeHead(302, { 'Location': links[code] });
-            res.end();
-        } else {
-            logger.log('ERROR', `Invalid short URL accessed: ${req.url}`);
-            fs.readFile(path.join(__dirname, 'views', '404.html'), 'utf8', (err, data) => {
+            addLink(code, longUrl, (err) => {
                 if (err) {
                     res.writeHead(500, { 'Content-Type': 'text/plain' });
-                    return res.end('Server error');
+                    return res.end('Error saving to database');
                 }
-                res.writeHead(404, { 'Content-Type': 'text/html' });
-                res.end(data);
+
+                const shortUrl = `${DOMAIN}:${PORT}/goto/${code}`;
+                logger.log('SHRINK', `New URL: ${longUrl} -> ${shortUrl}`);
+
+                res.writeHead(200, { 'Content-Type': 'text/plain' });
+                res.end(shortUrl);
             });
-        }
+        });
+
+    } else if (req.url.startsWith('/goto/') && req.method === 'GET') {
+        // Redirect to long URL
+        const code = req.url.replace('/goto/', '');
+
+        getLink(code, (err, longUrl) => {
+            if (err || !longUrl) {
+                logger.log('ERROR', `Invalid short URL accessed: ${req.url}`);
+                fs.readFile(path.join(__dirname, 'views', '404.html'), 'utf8', (err, data) => {
+                    if (err) {
+                        res.writeHead(500, { 'Content-Type': 'text/plain' });
+                        return res.end('Server error');
+                    }
+                    res.writeHead(404, { 'Content-Type': 'text/html' });
+                    res.end(data);
+                });
+            } else {
+                logger.log('REDIRECT', `Redirecting ${DOMAIN}:${PORT}/goto/${code} to ${longUrl}`);
+                res.writeHead(302, { 'Location': longUrl });
+                res.end();
+            }
+        });
+
     } else {
-        // 404
+        // 404 Not Found
         fs.readFile(path.join(__dirname, 'views', '404.html'), 'utf8', (err, data) => {
             if (err) {
                 res.writeHead(500, { 'Content-Type': 'text/plain' });
@@ -150,6 +134,7 @@ const server = http.createServer((req, res) => {
     }
 });
 
+// Start the server
 server.listen(PORT, () => {
     logger.log('INFO', `Server is running at ${DOMAIN}:${PORT}`);
 });
