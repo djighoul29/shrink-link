@@ -2,6 +2,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
+const logger = require('./emitter/logger');
+
 const PORT = 3000;
 const DOMAIN = 'http://localhost';
 
@@ -27,12 +29,12 @@ function readLinks() {
 
     if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
-        console.log('Created "data" directory.');
+        logger.log('DATA', 'Created "data" directory.');
     }
 
     if (!fs.existsSync(filePath)) {
         fs.writeFileSync(filePath, JSON.stringify({}, null, 2), 'utf8');
-        console.log('Created links.json as it did not exist.');
+        logger.log('DATA', 'Created links.json as it did not exist.');
     }
 
     try {
@@ -109,6 +111,8 @@ const server = http.createServer((req, res) => {
             const code = generateCode();
             links[code] = longUrl;
             saveLinks(links);
+            logger.log('SHRINK', `New URL: ${longUrl} -> ${DOMAIN}:${PORT}/goto/${code}`);
+
 
             const shortUrl = `${DOMAIN}:${PORT}/goto/${code}`;
             res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -119,9 +123,11 @@ const server = http.createServer((req, res) => {
         const links = readLinks();
     
         if (links[code]) {
+            logger.log('REDIRECT', `Redirecting ${DOMAIN}:${PORT}/goto/${code} to ${links[code]}`);
             res.writeHead(302, { 'Location': links[code] });
             res.end();
         } else {
+            logger.log('ERROR', `Invalid short URL accessed: ${req.url}`);
             fs.readFile(path.join(__dirname, 'views', '404.html'), 'utf8', (err, data) => {
                 if (err) {
                     res.writeHead(500, { 'Content-Type': 'text/plain' });
@@ -145,5 +151,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`Server is running at ${DOMAIN}:${PORT}`);
+    logger.log('INFO', `Server is running at ${DOMAIN}:${PORT}`);
 });
