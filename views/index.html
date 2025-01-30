@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shrink Link</title>
+    <title>✂️ Shrink Link - URL shortener</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
     <main class="container">
-        <h1>Shrink Link</h1>
+        <h1><i class="fa-solid fa-scissors"></i> Shrink Link</h1>
         <form id="shrink-form" action="/shrink" method="POST">
             <label for="longUrl">Enter your long URL:</label>
             <input type="url" id="longUrl" name="longUrl" placeholder="https://example.com" required>
-            <button type="submit">Shrink!</button>
+            <button type="submit"><i class="fa-solid fa-scissors"></i> Shrink!</button>
         </form>
-
-        <!-- Result Block -->
         <div id="result">
             <label for="shortLink">Your shortened link (click to copy):</label>
             <input type="url" id="shortLink" readonly></input>
         </div>
     </main>
-
+    <footer class="container-fluid">
+        <p>Created by Oleksii Ivanyshyn | <a href="/about.html">About this website</a></p>
+    </footer>
     <script src="/script.js"></script>
 </body>
 </html>

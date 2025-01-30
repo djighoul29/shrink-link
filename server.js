@@ -80,6 +80,16 @@ const server = http.createServer((req, res) => {
             res.writeHead(200, { 'Content-Type': 'application/javascript' });
             res.end(data);
         });
+    } else if (req.url === '/about.html' && req.method === 'GET') {
+        // Serve about.html
+        fs.readFile(path.join(__dirname, 'views', 'about.html'), 'utf8', (err, data) => {
+            if (err) {
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                return res.end('Server error');
+            }
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.end(data);
+        });
     } else if (req.url === '/shrink' && req.method === 'POST') {
         // Form processing
         let body = '';
