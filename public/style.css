@@ -12,6 +12,24 @@ footer {
     text-align: center;
 }
 
+#copyMsg {
+    width: fit-content;
+    background-color: rgba(0, 128, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#copyMsg.show {
+    opacity: 1;
+}
+
 footer p {
     margin: 0;
     font-size: .7rem;

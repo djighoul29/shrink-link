@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const result = document.getElementById('result');
     const shortLink = document.getElementById('shortLink');
     const longUrl = document.getElementById('longUrl');
+    const copyMsg = document.getElementById('copyMsg');
 
     longUrl.addEventListener('click', () => {
         longUrl.select();
@@ -33,6 +34,12 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             await navigator.clipboard.writeText(shortLink.value);
             shortLink.style.backgroundColor = 'var(--pico-border-color)';
+
+            // Showing "Copied" message
+            copyMsg.classList.add('show');
+            setTimeout(() => {
+                copyMsg.classList.remove('show');
+            }, 3000); // Will disappear after 3 seconds
 
         } catch (err) {
             console.error('Failed to copy:', err);
