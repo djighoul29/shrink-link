@@ -3,10 +3,11 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = 3000;
-const DOMAIN = 'http://localhost';
 
 const logger = require('./logger');
 const { addLink, getLink } = require('./database');
+
+let serverStarted = false;
 
 // Short URL code generator
 function generateCode() {
@@ -25,6 +26,13 @@ function generateCode() {
 
 // Server creation
 const server = http.createServer((req, res) => {
+    const DOMAIN = `${req.headers['x-forwarded-proto'] || 'http'}://${req.headers.host}`;
+
+    if (!serverStarted) {
+        logger.log('INFO', `Server is running at ${DOMAIN}`);
+        serverStarted = true;
+    }
+
     if (req.url === '/' && req.method === 'GET') {
         // Main page
         fs.readFile(path.join(__dirname, 'views', 'index.html'), 'utf8', (err, data) => {
@@ -135,6 +143,4 @@ const server = http.createServer((req, res) => {
 });
 
 // Start the server
-server.listen(PORT, () => {
-    logger.log('INFO', `Server is running at ${DOMAIN}:${PORT}`);
-});
+server.listen(PORT);
