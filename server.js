@@ -99,7 +99,7 @@ const server = http.createServer((req, res) => {
                     return res.end('Error saving to database');
                 }
 
-                const shortUrl = `${DOMAIN}:${PORT}/goto/${code}`;
+                const shortUrl = `${DOMAIN}/goto/${code}`;
                 logger.log('SHRINK', `New URL: ${longUrl} -> ${shortUrl}`);
 
                 res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -123,7 +123,7 @@ const server = http.createServer((req, res) => {
                     res.end(data);
                 });
             } else {
-                logger.log('REDIRECT', `Redirecting ${DOMAIN}:${PORT}/goto/${code} to ${longUrl}`);
+                logger.log('REDIRECT', `Redirecting ${DOMAIN}/goto/${code} to ${longUrl}`);
                 res.writeHead(302, { 'Location': longUrl });
                 res.end();
             }
