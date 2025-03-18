@@ -1,7 +1,7 @@
 # Shrink Link    
 
 ### 🌐 Live Demo  
-🔗 **Try it here:** [Shrink Link on Render](https://shrink-link-11js.onrender.com)  
+🔗 **Try it here:** [Shrink Link on Render](https://shrink-link-11js.onrender.com) (takes some time to load)  
 
 ---
 
